@@ -31,11 +31,18 @@ and still looks complete.
 ## Install
 
 ```bash
+npx skills add Pustelto/code-review-skills            # this project
+npx skills add Pustelto/code-review-skills --global   # or install for every project
+```
+
+Or clone and symlink it yourself:
+
+```bash
 git clone https://github.com/Pustelto/code-review-skills.git
 ln -s "$PWD/code-review-skills/code-review" ~/.claude/skills/code-review
 ```
 
-Then in Claude Code:
+Either way, in Claude Code:
 
 ```
 /code-review
@@ -48,11 +55,15 @@ Then in Claude Code:
 with no Python and no network access. `gh` / `glab` are optional; with them the review reads the
 PR/MR description and its existing discussion threads (read-only — it never posts).
 
-Verify the pre-pass works, from inside any git repo:
+Verify the pre-pass works — run this from inside any git repo, pointing at wherever the skill
+landed (`./.claude/skills/…` for a project install, `~/.claude/skills/…` for a global one):
 
 ```bash
-node ~/.claude/skills/code-review/tools/blast-radius.mjs "$(git rev-parse --show-toplevel)" --base origin/main
+node .claude/skills/code-review/tools/blast-radius.mjs "$(git rev-parse --show-toplevel)" --base origin/main
 ```
+
+It should print a `STATIC BLAST-RADIUS` report. If it doesn't, the review still runs — it falls back
+to `rg` and says so in its trust caveats.
 
 The clone is ~12 MB — most of it the vendored WASM grammars for TypeScript/TSX, Java, Kotlin,
 Python, Go and Ruby.
@@ -112,7 +123,7 @@ broken callers, edge cases, error paths, races, resource lifecycle, contract cha
 tests. It is thin on whether the design survives six months. **Keep a human on design review.**
 
 **It is not cheap.** A full review on Opus fans out subagents and reads a lot of code — measured at
-roughly **$5–10 per review** on PRs of 10–50 changed files, and 10–20 minutes of wall clock. It is
+roughly **$7–10 per review** on PRs of 10–50 changed files, and 10–20 minutes of wall clock. It is
 built for the change you actually want caught before it ships, not for every commit.
 
 ## Acknowledgements
