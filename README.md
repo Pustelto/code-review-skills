@@ -31,7 +31,7 @@ and still looks complete.
 ## Install
 
 ```bash
-git clone https://github.com/<you>/code-review-skills.git
+git clone https://github.com/Pustelto/code-review-skills.git
 ln -s "$PWD/code-review-skills/code-review" ~/.claude/skills/code-review
 ```
 
@@ -44,8 +44,18 @@ Then in Claude Code:
 /code-review --audit          # append the evidence tables
 ```
 
-Requirements: **Node** on `PATH` (for the static pre-pass — no Python, no network, grammars are
-vendored) and optionally `gh` / `glab` to pull PR/MR discussions.
+**Requirements:** **Node 18+** on `PATH` — the static pre-pass runs a vendored tree-sitter parser,
+with no Python and no network access. `gh` / `glab` are optional; with them the review reads the
+PR/MR description and its existing discussion threads (read-only — it never posts).
+
+Verify the pre-pass works, from inside any git repo:
+
+```bash
+node ~/.claude/skills/code-review/tools/blast-radius.mjs "$(git rev-parse --show-toplevel)" --base origin/main
+```
+
+The clone is ~12 MB — most of it the vendored WASM grammars for TypeScript/TSX, Java, Kotlin,
+Python, Go and Ruby.
 
 ## What it does
 
@@ -101,7 +111,9 @@ future, and this skill, like every AI reviewer measured, is markedly weaker ther
 broken callers, edge cases, error paths, races, resource lifecycle, contract changes and missing
 tests. It is thin on whether the design survives six months. **Keep a human on design review.**
 
-**It is not cheap.** A full review on Opus fans out subagents and reads a lot of code.
+**It is not cheap.** A full review on Opus fans out subagents and reads a lot of code — measured at
+roughly **$5–10 per review** on PRs of 10–50 changed files, and 10–20 minutes of wall clock. It is
+built for the change you actually want caught before it ships, not for every commit.
 
 ## Acknowledgements
 
